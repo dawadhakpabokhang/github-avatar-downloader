@@ -3,6 +3,8 @@ var filePath = "./downloadPics";
 var GITHUB_USER = "dawadhakpabokhang";
 var GITHUB_TOKEN = "67e8d115254c7d38a0f240517fe063286025986e";
 var fs = require("fs");
+var repoOwner = process.argv[2];
+var repoName = process.argv[3];
 
 function getRepoContributors(repoOwner, repoName, cb) {
 
@@ -26,9 +28,11 @@ function getRepoContributors(repoOwner, repoName, cb) {
       if (response && response.statusCode === 200) {
         // Request OK, parse data
         var json = JSON.parse(body);
+        // loop through each item in body and run the downloadImageByURL function
         for (contributor of json){
-          downloadImageByURL(contributor.avatar_url, filePath + "/" + contributor.login)
+          downloadImageByURL(contributor.avatar_url, filePath + "/" + contributor.login);
         }
+
         return;
       }
 
@@ -37,17 +41,9 @@ function getRepoContributors(repoOwner, repoName, cb) {
 
 function downloadImageByURL(url, filePath) {
   request.get(url)
-   .on('error', function (err) {
-     throw err;
-   })
-   .on('response', function (response) {
-     console.log('Response Status Code: ', response.statusCode);
-   })
    // fs is in reference to file stream which needs to be defined above
    .pipe(fs.createWriteStream(filePath));
 }
 
-getRepoContributors("jquery", "jquery", function(err, result) {
-  console.log("Errors:", err);
-  console.log("Result:", result);
+getRepoContributors(repoOwner, repoName, function(err, result) {
 });
